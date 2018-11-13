@@ -76,7 +76,7 @@ export class StencilLanguageServer {
 				textDocumentSync: TextDocumentSyncKind.Full,
 				completionProvider: {
 					resolveProvider: true,
-					triggerCharacters: ['"', "'", '/', ':', '.', '@']
+					triggerCharacters: ['"', "'", '/', ':', '.']
 				},
 				documentLinkProvider: {
 					resolveProvider: true
@@ -90,6 +90,7 @@ export class StencilLanguageServer {
 
 	onInitialized(_: InitializedParams): void {
 		this.connection.console.log('StencilLanguageServer Initialized.');
+		
 		if (this.hasCapability(CAPABILITY.CONFIGURATION)) {
 			this.connection.client.register(DidChangeConfigurationNotification.type, undefined);
 		}

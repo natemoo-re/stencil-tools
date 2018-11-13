@@ -37,7 +37,7 @@ const SLASH_REGEX = /\\/g;
 // https://github.com/TooTallNate/file-uri-to-path
 import { sep } from "path";
 export function uri2path(uri: string) {
-	if ("string" != typeof uri || uri.length <= 7 || "file://" != uri.substring(0, 7)) {
+	if (typeof uri !== 'string' || uri.length <= 7 || uri.substring(0, 7) !== 'file://') {
 		throw new TypeError("must pass in a file:// URI to convert to a file path");
 	}
 

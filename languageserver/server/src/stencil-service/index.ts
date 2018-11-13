@@ -1,8 +1,7 @@
 import { TextDocumentIdentifier, Position, CompletionItem, Diagnostic, DocumentLink, Hover } from "vscode-languageserver";
 import { ProjectManager } from '../project-manager';
-import * as ts from 'typescript';
 
-import { CompletionCtrl } from './features/completions';
+import { CompletionService } from './features/completions';
 import { MetadataService } from './features/metadata';
 
 export class StencilService {
@@ -24,15 +23,15 @@ export class StencilService {
 	getCompletionItems(textDocument: TextDocumentIdentifier, position: Position): CompletionItem[] {
 		const sourceFile = this.projectManager.getSourceFile(textDocument);
 		const offset = sourceFile.getPositionOfLineAndCharacter(position.line, position.character);
-		const container = CompletionCtrl.getNodeContainingPosition(sourceFile, offset);
+		const container = CompletionService.getNodeContainingPosition(sourceFile, offset);
 
 		if (!container) return [];
 		
 		const { componentMembers } = this._getMetadata(textDocument);
 		const checker = this.projectManager.getTypeChecker();
 
-		return CompletionCtrl.getByNode(container, { componentMembers, checker })
-			.map(CompletionCtrl.addData({ textDocument }));
+		return CompletionService.getByNode(container, { componentMembers, checker })
+			.map(CompletionService.addData({ textDocument }));
 	}
 
 	resolveCompletionItem(item: CompletionItem): CompletionItem {
@@ -40,10 +39,11 @@ export class StencilService {
 			// Resolve additionalTextEdits for Decorators with AutoImport support
 			if (item.data.autoImport) {
 				const { stencilImport } = this._getMetadata({ uri: item.data.textDocument.uri });
-				const additionalTextEdits = CompletionCtrl.buildAdditionalTextEdits(stencilImport, item.data.autoImport);
+				const additionalTextEdits = CompletionService.buildAdditionalTextEdits(stencilImport, item.data.autoImport);
 				
 				item = Object.assign({}, item, { additionalTextEdits })
 			}
+
 			
 			// Do placeholder replacements based on Label name
 			switch (item.label) {

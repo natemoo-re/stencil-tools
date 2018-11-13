@@ -238,7 +238,7 @@ export const DECORATORS: CompletionItem[] = [
 	}
 ].map((item) => {
 	const { label } = item; 
-	const detail = label === 'Listen (decorator only)' ? `Stencil: Listen() Decorator\nAuto import from '@stencil/core'` : `Stencil: @${item.label}() Decorator\nAuto import from '@stencil/core'`;
+	const detail = label === 'Listen (decorator only)' ? `Stencil: @Listen() Decorator\nAuto import from '@stencil/core'` : `Stencil: @${item.label}() Decorator\nAuto import from '@stencil/core'`;
 	return {
 		label,
 		detail,

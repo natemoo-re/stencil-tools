@@ -30,6 +30,18 @@
 			"problemMatcher": [
 				"$tsc-watch"
 			]
+		},
+		{
+			"type": "npm",
+			"label": "build:languageserver",
+			"script": "build",
+			"path": "languageserver/server/",
+			"isBackground": true,
+			"group": "build",
+			"presentation": {
+				"panel": "dedicated",
+				"reveal": "never"
+			}
 		}
 	]
 }

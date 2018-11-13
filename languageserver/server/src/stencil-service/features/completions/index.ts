@@ -102,4 +102,4 @@ class CompletionController {
 
 }
 
-export const CompletionCtrl = new CompletionController();
+export const CompletionService = new CompletionController();
