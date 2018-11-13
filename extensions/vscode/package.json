@@ -1,0 +1,60 @@
+{
+	"name": "vscode-stencil-tools",
+	"displayName": "Stencil Tools",
+	"description": "Helpful utilities for StencilJS Projects",
+	"version": "3.0.0-alpha.0",
+	"license": "MIT",
+	"author": {
+		"name": "Nate Moore",
+		"url": "https://projects.natemoo.re",
+		"email": "nate@natemoo.re"
+	},
+	"publisher": "natemoo-re",
+	"galleryBanner": {
+		"color": "#FFFFFF",
+		"theme": "light"
+	},
+	"main": "dist/extension.js",
+	"scripts": {
+		"start": "npm run watch",
+		"watch": "tsc -w -p .",
+		"build": "tsc -p .",
+		"update-vscode": "node ./node_modules/vscode/bin/install"
+	},
+	"homepage": "https://github.com/natemoo-re/stencil-tools/#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/natemoo-re/stencil-tools.git"
+	},
+	"bugs": {
+		"url": "https://github.com/natemoo-re/stencil-tools/issues"
+	},
+	"dependencies": {
+		"@stencil-tools/languageserver": "^3.0.0-alpha.0",
+		"vscode": "^1.1.18",
+		"vscode-languageclient": "^4.1.4",
+		"typescript": "^3.1.6"
+	},
+	"devDependencies": {
+		"@types/node": "^10.12.6"
+	},
+	"engines": {
+		"vscode": "^1.26.1"
+	},
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"stencil",
+		"stencil component",
+		"stencil generate component",
+		"typescript",
+		"tsx"
+	],
+	"activationEvents": [
+		"workspaceContains:**/stencil.config.js",
+		"workspaceContains:**/stencil.config.ts",
+		"workspaceContains:**/.stencilTools",
+		"onCommand:extension.stencilTools.startProject"
+	]
+}

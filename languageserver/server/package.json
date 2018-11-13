@@ -1,0 +1,33 @@
+{
+  "name": "@stencil-tools/languageserver",
+  "version": "3.0.0-alpha.0",
+  "description": "",
+  "license": "MIT",
+  "author": {
+    "name": "Nate Moore",
+    "url": "https://projects.natemoo.re",
+    "email": "nate@natemoo.re"
+  },
+  "main": "dist/main.js",
+  "types": "dist/types/main.d.ts",
+  "scripts": {
+    "start": "npm run watch",
+    "watch": "tsc -w -p .",
+    "build": "tsc -p ."
+  },
+  "homepage": "https://github.com/natemoo-re/stencil-tools/#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natemoo-re/stencil-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/natemoo-re/stencil-tools/issues"
+  },
+  "dependencies": {
+    "typescript": "^3.0.1",
+    "vscode-languageserver": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^10.7.0"
+  }
+}
