@@ -2,6 +2,20 @@
   "name": "@stencil-tools/root",
   "private": true,
   "devDependencies": {
-    "lerna": "^3.4.3"
+    "ava": "1.0.0-rc.2",
+    "lerna": "^3.4.3",
+    "ts-node": "^7.0.1"
+  },
+  "ava": {
+    "compileEnhancements": false,
+    "files": [
+      "**/*.spec.ts"
+    ],
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
   }
 }

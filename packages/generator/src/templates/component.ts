@@ -1,24 +1,28 @@
-import { ComponentOptions } from './options';
+import { ComponentOptions } from './declarations';
+import { defaultFormat } from './shared';
 
 const defaultOpts: ComponentOptions = {
-    quotes: `'`,
-    indent: '  ',
     imports: [],
     prefix: '',
+    selector: 'my-component',
     tag: 'my-component',
     styleExt: 'css',
     className: 'MyComponent',
     shadow: true
 }
 
-const component = (opts: Partial<ComponentOptions>) => {
-    opts = { ...defaultOpts, ...opts };
+const component = (opts?: Partial<ComponentOptions> & { indent?: string, quotes?: string }) => {
+    if (opts) {
+        opts = { ...defaultFormat, ...defaultOpts, ...opts }
+    } else {
+        opts = { ...defaultFormat, ...defaultOpts }
+    }
     const indent = (n: number = 1) => opts.indent.repeat(n);
     const quote = (text: string) => `${opts.quotes}${text}${opts.quotes}`;
     
     const imports = `{ ${['Component', ...opts.imports].join(', ')} }`;
-    const tag = `${opts.prefix}-${opts.tag}`;
-    const styleUrl = `${opts.tag}${opts.styleExt}`;
+    const tag = opts.selector;
+    const styleUrl = `${opts.tag}.${opts.styleExt}`;
     const shadow = opts.shadow ? `,\n${indent(1)}shadow: true` : '';
 
     return `import ${imports} from ${quote('@stencil/core')};

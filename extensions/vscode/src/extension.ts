@@ -20,4 +20,8 @@ export function activate(context: ExtensionContext) {
 			return files;
 		})
 	})
+
+	workspace.onDidChangeTextDocument((event) => {
+		
+	})
 }

@@ -1,0 +1,44 @@
+{
+  "name": "@stencil-tools/generator",
+  "version": "3.0.0-alpha.0",
+  "description": "",
+  "license": "MIT",
+  "author": {
+    "name": "Nate Moore",
+    "url": "https://projects.natemoo.re",
+    "email": "nate@natemoo.re"
+  },
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "test": "../../node_modules/.bin/ava",
+    "start": "npm run watch",
+    "watch": "tsc -w -p .",
+    "build": "tsc -p ."
+  },
+  "homepage": "https://github.com/natemoo-re/stencil-tools/#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natemoo-re/stencil-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/natemoo-re/stencil-tools/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^10.7.0",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.0.1"
+  },
+  "ava": {
+    "compileEnhancements": false,
+    "files": [
+      "**/*.spec.ts"
+    ],
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  }
+}
