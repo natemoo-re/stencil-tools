@@ -43,7 +43,7 @@ function attachClient(context: ExtensionContext) {
 			console.log('Recieved workspace/xfiles request');
 			const params = { base: workspace.workspaceFolders[0].uri.fsPath };
 			const files = await workspace.findFiles(`${params.base}/**/*`);
-			return files;
+			return (files.length) ? files : null;
 		})
 	})
 }

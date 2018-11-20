@@ -10,13 +10,16 @@ export class ProjectManager {
 	private host: ts.CompilerHost;
 	
 	private documents: TextDocuments;
+	
 	public getDocument({ uri }: TextDocumentIdentifier) {
 		return this.documents.get(uri);
 	}
 
 	constructor() {
-		console.log('Initializing ProjectManager');
 		this.documents = new TextDocuments();
+		this.documents.onDidChangeContent((documents) => {
+			documents.document.version
+		})
 		this.service = new StencilService(this);
 		this.host = ts.createCompilerHost({ target: ts.ScriptTarget.ES2017 });
 		this.createProgram([]);
@@ -36,6 +39,7 @@ export class ProjectManager {
 	}
 
 	private service: StencilService;
+	
 	public getStencilService() {
 		return this.service;
 	}
@@ -48,6 +52,7 @@ export class ProjectManager {
 		
 		return newSourceFile;
 	}
+	
 	public getSourceFiles(): ReadonlyArray<ts.SourceFile> {
 		return this.ts.getSourceFiles();
 	}
