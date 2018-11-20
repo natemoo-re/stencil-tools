@@ -118,7 +118,7 @@ export const METHODS: CompletionItem[] = [
 			"render() {",
 			"\treturn (",
 			"\t\t<div>",
-			"\t\t\t<p>Hello my-component!</p>",
+			"\t\t\t<p>Hello <code>%componentTag%</code></p>",
 			"\t\t</div>",
 			"\t);",
 			"}"
@@ -126,6 +126,7 @@ export const METHODS: CompletionItem[] = [
 	}
 ].map((item) => {
 	const resolve = (item.label === 'render');
+	const hasPlaceholders = (item.label === 'render');
 	return {
 		label: item.label,
 		detail: `Stencil: Component Method\n${item.label}`,
@@ -134,7 +135,7 @@ export const METHODS: CompletionItem[] = [
 			kind: MarkupKind.Markdown,
 			value: flatten(item.description) + flatten([
 				'\n',
-				'```ts',
+				'```tsx',
 				flatten(item.preview),
 				'```'
 			])
@@ -143,6 +144,7 @@ export const METHODS: CompletionItem[] = [
 		insertTextFormat: InsertTextFormat.Snippet,
 		data: {
 			resolve,
+			hasPlaceholders,
 			isFilterable: true
 		}
 	}
@@ -238,6 +240,7 @@ export const DECORATORS: CompletionItem[] = [
 	}
 ].map((item) => {
 	const { label } = item; 
+	const hasPlaceholders = (item.label === 'Watch');
 	const detail = label === 'Listen (decorator only)' ? `Stencil: @Listen() Decorator\nAuto import from '@stencil/core'` : `Stencil: @${item.label}() Decorator\nAuto import from '@stencil/core'`;
 	return {
 		label,
@@ -247,7 +250,7 @@ export const DECORATORS: CompletionItem[] = [
 			kind: MarkupKind.Markdown,
 			value: flatten(item.description) + flatten([
 				'\n',
-				'```ts',
+				'```tsx',
 				flatten(item.preview),
 				'```'
 			])
@@ -256,6 +259,7 @@ export const DECORATORS: CompletionItem[] = [
 		insertTextFormat: InsertTextFormat.Snippet,
 		data: {
 			resolve: true,
+			hasPlaceholders,
 			isFilterable: false,
 			autoImport: item.autoImport
 		}

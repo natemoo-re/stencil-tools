@@ -1,12 +1,12 @@
 import { getStencilImport, StencilImport } from '../completions/auto-import';
-import { TextDocumentIdentifier } from 'vscode-languageserver';
+import { TextDocumentIdentifier, Range } from 'vscode-languageserver';
 import { ProjectManager } from '../../../project-manager';
 
-import { getDecoratedMembers } from './util';
+import { getDecoratedMembers, getComponentOptions } from './util';
 
 export interface DocumentMetadata {
 	stencilImport: StencilImport;
-	componentOptions: { [key: string]: any };
+	componentOptions: { value: { [key: string]: any }, range: Range };
 	componentMembers: string[];
 	methods: string[];
 	props: string[];
@@ -22,15 +22,15 @@ export class MetadataService {
 	private _cache = new Map<string, DocumentMetadata>();
 
 	private collectMetadata({ uri }: TextDocumentIdentifier): DocumentMetadata {
-		console.log('Collecting Metadata');
 		const sourceFile = this.projectManager.getSourceFile({ uri });
 		const stencilImport = getStencilImport(sourceFile);
+		const componentOptions = getComponentOptions(sourceFile);
 		const { methods, members, props, states, watched } = getDecoratedMembers(sourceFile);
 
 		return {
-			stencilImport,
-			componentOptions: { },
 			componentMembers: members,
+			stencilImport,
+			componentOptions,
 			methods, props, states, watched
 		};
 	}
@@ -44,7 +44,7 @@ export class MetadataService {
 			const metadata = this.collectMetadata({ uri });
 			this._versions.set(uri, document.version);
 			this._cache.set(uri, metadata);
-			
+		
 			return metadata;
 		}
 	}

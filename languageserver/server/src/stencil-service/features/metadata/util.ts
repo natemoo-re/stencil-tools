@@ -1,11 +1,29 @@
 import * as ts from 'typescript';
+import { Range } from 'vscode-languageserver';
+
+export function getComponentOptions(sourceFile: ts.SourceFile): { value: any, range: Range } {
+	let options: any = null;
+	let range: Range = null;
+
+	function visit(node: ts.Node) {
+		if (ts.isClassDeclaration(node) && isComponentClass(node)) {
+			const component = node.decorators.filter(isDecoratorNamed('Component'))[0];
+			options = getDeclarationParameters<any>(sourceFile, component);
+			range = Range.create(ts.getLineAndCharacterOfPosition(sourceFile, component.pos), ts.getLineAndCharacterOfPosition(sourceFile, component.end))
+		}
+		node.forEachChild(visit);
+	}
+	visit(sourceFile);
+	
+	return { value: options[0], range };
+}
 
 interface DecoratedMembers {
 	props: string[];
 	states: string[];
-	watched: string[];
 	methods: string[];
 	members: string[];
+	watched: string[];
 }
 export function getDecoratedMembers(sourceFile: ts.SourceFile): DecoratedMembers {
 	const props: string[] = [];
@@ -27,11 +45,18 @@ export function getDecoratedMembers(sourceFile: ts.SourceFile): DecoratedMembers
 							break;
 						case 'State': states.push(name);
 							break;
-						case 'Watch':
-							const arg = getDecoratorArguments(member.decorators[0])[0];
-							if (arg && ts.isStringLiteral(arg)) watched.push(arg.text);
-							break;
 						default:
+							break;
+					}
+				})
+			
+			node.members.filter(isMethodWithDecorators)
+				.forEach(member => {
+					const name = member.name && ts.isIdentifier(member.name) && member.name.text;
+					switch (getDecoratorName(member)) {
+						case 'Watch':
+							const [arg] = getDeclarationParameters(sourceFile, member.decorators[0]);
+							if (arg) watched.push(arg);
 							break;
 					}
 				})
@@ -92,3 +117,23 @@ export function isMethodWithDecorators(member: ts.ClassElement): boolean {
 		&& Array.isArray(member.decorators)
 		&& member.decorators.length > 0;
 }
+
+export function evalText(text: string) {
+	const fnStr = `return ${text};`;
+	return new Function(fnStr)();
+}
+
+export interface GetDeclarationParameters {
+	<T>(sourceFile: ts.SourceFile, decorator: ts.Decorator): [T];
+	<T, T1>(sourceFile: ts.SourceFile, decorator: ts.Decorator): [T, T1];
+	<T, T1, T2>(sourceFile: ts.SourceFile, decorator: ts.Decorator): [T, T1, T2];
+}
+export const getDeclarationParameters: GetDeclarationParameters = (sourceFile: ts.SourceFile, decorator: ts.Decorator): any => {
+	if (!ts.isCallExpression(decorator.expression)) {
+		return [];
+	}
+
+	return decorator.expression.arguments.map((arg) => {
+		return evalText(arg.getText(sourceFile).trim());
+	});
+};
