@@ -1,12 +1,12 @@
-import {
-	Connection, InitializeParams, InitializeResult, TextDocumentSyncKind, DidChangeConfigurationNotification, CompletionParams, InitializedParams, CompletionItem, TextDocumentIdentifier, DocumentLinkParams, TextDocumentPositionParams, DidOpenTextDocumentParams, ServerCapabilities
-} from 'vscode-languageserver';
+import { Connection, InitializeParams, InitializeResult, TextDocumentSyncKind, DidChangeConfigurationNotification, CompletionParams, InitializedParams, CompletionItem, TextDocumentIdentifier, DocumentLinkParams, DidOpenTextDocumentParams, ServerCapabilities } from 'vscode-languageserver';
 
 import { CAPABILITY } from './capabilities';
 
 import { ProjectManager } from '../project-manager';
 import { StencilService } from '../stencil-service';
+import { Logger } from './logger';
 
+let logger: Logger;
 export class StencilLanguageServer {
 	
 	/** 
@@ -24,7 +24,8 @@ export class StencilLanguageServer {
 
 	constructor(connection: any) {
 		this.connection = connection;
-		
+		logger = new Logger(connection);
+
 		this.projectManager = new ProjectManager();
 		this.service = this.projectManager.getStencilService();
 
@@ -115,7 +116,7 @@ export class StencilLanguageServer {
 	}
 
 	onDocumentLinks({ textDocument }: DocumentLinkParams) {
-		return (this.hasCapability(CAPABILITY.DOCUMENT_LINKS)) ? this.service.getDocumentLinks(textDocument) : null;
+		return (this.hasCapability(CAPABILITY.DOCUMENT_LINKS)) ? this.service.getDocumentLinks(textDocument) : [];
 	}
 
 	onDocumentChange(textDocument: TextDocumentIdentifier) {
@@ -133,6 +134,6 @@ export class StencilLanguageServer {
 		})
 	}
 
-	
-
 }
+
+export { logger };
