@@ -43,13 +43,12 @@ export class StencilService {
 				
 				item = Object.assign({}, item, { additionalTextEdits })
 			}
-
 			
 			// Do placeholder replacements based on Label name
 			switch (item.label) {
 				case 'render':
 					const { componentOptions } = this._getMetadata(item.data.textDocument.uri);
-					item.insertText = item.insertText.replace(/{{componentTag}}/g, componentOptions.tag);
+					item = CompletionService.replaceTemplate(item, { componentTag: componentOptions.tag });
 					break;
 				case 'Watch':
 					console.log(item);
@@ -58,9 +57,9 @@ export class StencilService {
 					if (!computedProps) computedProps = ['propName'];
 
 					if (computedProps.length > 1) {
-						item.insertText = item.insertText.replace('{{computedProps}}', `|${computedProps.join(',')}|`);
+						item = CompletionService.replaceTemplate(item, { computedProps: `|${computedProps.join(',')}|` });
 					} else if (computedProps.length === 1) {
-						item.insertText = item.insertText.replace('{{computedProps}}', `:${computedProps[0]}`);
+						item = CompletionService.replaceTemplate(item, { computedProps: `:${computedProps[0]}` });
 					}
 					break;
 				default: break;

@@ -4,12 +4,11 @@ import { StencilGenerator } from '@stencil-tools/generator';
 import { fs } from './sys';
 
 const run = async () => {
-    const generator = new StencilGenerator({ fs })
+    const generator = new StencilGenerator({ fs }, cwd())
     
     await generator.create('my-component', {
         baseDir: path.join(cwd(), 'demo', 'components'),
-        styleExt: 'scss',
-        componentPrefix: 'x'
+        styleExt: 'scss'
     })
 }
 

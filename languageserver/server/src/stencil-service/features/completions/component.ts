@@ -109,7 +109,7 @@ export const METHODS: CompletionItem[] = [
 			"render() {",
 			"\treturn (",
 			"\t\t<div>",
-			"\t\t\t${1:<p>Hello <code>{{componentTag}}</code></p>}$0",
+			"\t\t\t${1:<p>Hello <code>%componentTag%</code></p>}$0",
 			"\t\t</div>",
 			"\t);",
 			"}"
@@ -125,7 +125,7 @@ export const METHODS: CompletionItem[] = [
 		]
 	}
 ].map((item) => {
-	const resolve = item.label === 'render';
+	const resolve = (item.label === 'render');
 	return {
 		label: item.label,
 		detail: `Stencil: Component Method\n${item.label}`,
@@ -160,7 +160,7 @@ export const DECORATORS: CompletionItem[] = [
 		label: 'Watch',
 		description: "When a user updates a property, `@Watch()` will fire what ever method it's attached to and pass that methd the new value of the prop along with the old value.",
 		insertText: [
-			"@Watch('${1{{computedProps}}}')",
+			"@Watch('${1%computedProps%}')",
 			"${1}Changed() {",
 			"\t${2:console.log('$1 changed to ', this.$1);}$0",
 			"}"

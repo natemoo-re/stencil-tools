@@ -25,6 +25,11 @@ export class MyComponent {
   t.is(sourceText, template);
 })
 
+test('ends with a newline', t => {
+  const sourceText = component();
+  t.true(sourceText.endsWith('\n'));
+})
+
 test('generates file with tabs', t => {
   const indent = '\t';
   const sourceText = component({ indent });

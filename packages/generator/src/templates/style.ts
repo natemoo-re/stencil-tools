@@ -1,5 +1,5 @@
 import { StyleOptions } from './declarations';
-import { defaultFormat } from './shared';
+import { defaultFormat, createIndent } from './shared';
 
 const defaultOpts: StyleOptions = {
     selector: 'my-component',
@@ -15,7 +15,7 @@ const style = (opts?: Partial<StyleOptions> & { indent?: string }) => {
     }
 
     const indentedSyntax = opts.styleExt === 'sass';
-    const indent = (n: number = 1) => opts.indent.repeat(n);
+    const indent = createIndent(opts.indent);
     const selector = opts.shadow ? ':host' : opts.selector;
 
     if (indentedSyntax) {

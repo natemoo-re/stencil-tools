@@ -17,9 +17,11 @@ export interface StyleOptions {
 export interface E2EOptions {
     selector: string;
     className: string;
+    url: string;
 }
 
 export interface SpecOptions {
+    tag: string;
     selector: string;
     className: string;
 }

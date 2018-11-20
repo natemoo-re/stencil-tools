@@ -3,11 +3,13 @@ import { CompletionItem, TextEdit, InsertTextFormat, CompletionItemKind } from '
 import { getAutoImportEdit, StencilImport } from './auto-import';
 import { getDecoratorName } from './util';
 import { DECORATORS, METHODS, LIFECYCLE_METHODS } from './component';
+import { PROPS } from './router';
 import { PREFIXES, KEYCODE_SUFFIX, isElementRefPrefix, DOM_EVENT_SUFFIX } from './listen';
 
 class CompletionController {
 
 	private COMPONENT: CompletionItem[] = [...DECORATORS, ...METHODS, ...LIFECYCLE_METHODS];
+	private ROUTER: CompletionItem[] = [...PROPS];
 
 	getNodeContainingPosition(sourceFile: ts.SourceFile, position: number) {
 		let container: ts.Node;
@@ -98,6 +100,18 @@ class CompletionController {
 			completion.data = Object.assign({}, completion.data, additionalData);
 			return completion;
 		}
+	}
+
+	private buildRegex(name: string) {
+		return new RegExp(`\%${name}\%`, 'gm');
+	}
+	public replaceTemplate(item: CompletionItem, data: { [key: string]: string }) {
+		let { insertText } = item;
+		for (let [key, value] of Object.entries(data)) {
+			const pattern = this.buildRegex(key);
+			insertText = insertText.replace(pattern, value);
+		}
+		return Object.assign({}, item, { insertText });
 	}
 
 }

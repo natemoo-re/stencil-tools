@@ -1,5 +1,5 @@
 import { ComponentOptions } from './declarations';
-import { defaultFormat } from './shared';
+import { defaultFormat, createIndent, createQuote } from './shared';
 
 const defaultOpts: ComponentOptions = {
     imports: [],
@@ -17,8 +17,8 @@ const component = (opts?: Partial<ComponentOptions> & { indent?: string, quotes?
     } else {
         opts = { ...defaultFormat, ...defaultOpts }
     }
-    const indent = (n: number = 1) => opts.indent.repeat(n);
-    const quote = (text: string) => `${opts.quotes}${text}${opts.quotes}`;
+    const indent = createIndent(opts.indent);
+    const quote = createQuote(opts.quotes);
     
     const imports = `{ ${['Component', ...opts.imports].join(', ')} }`;
     const tag = opts.selector;
