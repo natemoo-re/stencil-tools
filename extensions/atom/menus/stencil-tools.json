@@ -1,0 +1,18 @@
+{
+    "menu": [
+        {
+            "label": "Packages",
+            "submenu": [
+                {
+                    "label": "Stencil Tools",
+                    "submenu": [
+                        {
+                            "label": "Toggle",
+                            "command": "stencil-tools:toggle"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

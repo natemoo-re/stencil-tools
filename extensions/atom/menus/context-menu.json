@@ -1,0 +1,10 @@
+{
+    "context-menu": {
+        "atom-text-editor": [
+            {
+                "label": "Toggle Stencil Tools",
+                "command": "stencil-tools:toggle"
+            }
+        ]
+    }
+}
