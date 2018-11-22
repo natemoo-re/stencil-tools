@@ -17,6 +17,7 @@ export function activate(context: ExtensionContext) {
 
 	workspace.onDidChangeWorkspaceFolders((e) => {
 		if (e.added) { checkWorkspace(); }
+		if (e.removed) { checkWorkspace(); }
 	})
 
 	workspace.onDidChangeTextDocument((event) => {
@@ -36,15 +37,13 @@ function attachClient(context: ExtensionContext) {
 	const clientOptions = getClientOptions(context);
 
 	client = new LanguageClient('stencilLanguageServer', 'Stencil Language Server', serverOptions, clientOptions);
-	client.start();
+	context.subscriptions.push(client.start());
 
 	client.onReady().then(() => {
 		client.onRequest('workspace/xfiles', async () => {
-			console.log('Recieved workspace/xfiles request');
-			const params = { base: workspace.workspaceFolders[0].uri.fsPath };
-			const files = await workspace.findFiles(`${params.base}/**/*`);
+			const files = await workspace.findFiles('src/**/*', '**/\.*', 100);
 			return (files.length) ? files : null;
-		})
+		});
 	})
 }
 
