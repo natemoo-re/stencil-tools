@@ -12,6 +12,10 @@ class DiagnosticsController {
     private getDiagnostics(document: TextDocument, metadata: DocumentMetadata): Diagnostic[] {
         const diagnostics: Diagnostic[] = [];
 
+        // metadata.links.map(link => {
+
+        // })
+
         this.setCache(document, diagnostics);
         return diagnostics;
     }

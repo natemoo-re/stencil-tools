@@ -1,4 +1,4 @@
-import { Connection, InitializeParams, InitializeResult, TextDocumentSyncKind, DidChangeConfigurationNotification, CompletionParams, InitializedParams, CompletionItem, TextDocumentIdentifier, DocumentLinkParams, DidOpenTextDocumentParams, ServerCapabilities } from 'vscode-languageserver';
+import { Connection, InitializeParams, InitializeResult, TextDocumentSyncKind, DidChangeConfigurationNotification, CompletionParams, InitializedParams, CompletionItem, TextDocumentIdentifier, DocumentLinkParams, DidOpenTextDocumentParams, ServerCapabilities, FileChangeType, DidChangeWatchedFilesParams, DidCloseTextDocumentParams, DocumentLink, TextDocumentChangeEvent, DidChangeTextDocumentParams } from 'vscode-languageserver';
 
 import { CAPABILITY } from './capabilities';
 
@@ -42,8 +42,9 @@ export class StencilLanguageServer {
 		this.connection.onCompletion(handler => this.onCompletion(handler));
 		this.connection.onCompletionResolve(handler => this.onCompletionResolve(handler));
 		this.connection.onDocumentLinks(handler => this.onDocumentLinks(handler));
-		
 		this.connection.onDidOpenTextDocument(handler => this.onDidOpenTextDocument(handler));
+		this.connection.onDidChangeTextDocument(handler => this.onDidChangeTextDocument(handler));
+		this.connection.onDidChangeWatchedFiles(handler => this.onDidChangeWatchedFiles(handler));
 	}
 
 	/** 
@@ -62,7 +63,7 @@ export class StencilLanguageServer {
 	/** 
 	 * Checks whether capability exists and is supported
 	 */
-	private hasCapability(capability: CAPABILITY): boolean {
+	private isCapable(capability: CAPABILITY): boolean {
 		return this.capabilities.has(capability) && this.capabilities.get(capability);
 	}
 
@@ -71,6 +72,7 @@ export class StencilLanguageServer {
 		this.capabilities.set(CAPABILITY.WORKSPACE_FOLDER, capabilities.workspace && !!capabilities.workspace.workspaceFolders);
 		this.capabilities.set(CAPABILITY.DIAGNOSTIC_RELATED_INFORMATION, capabilities.textDocument && capabilities.textDocument.publishDiagnostics && capabilities.textDocument.publishDiagnostics.relatedInformation);
 		this.capabilities.set(CAPABILITY.DOCUMENT_LINKS, capabilities.textDocument && capabilities.textDocument.documentLink && capabilities.textDocument.documentLink.dynamicRegistration);
+		this.capabilities.set(CAPABILITY.X_FILES, true);
 
 		const initializeResult: InitializeResult & { capabilities: ServerCapabilities & { xfilesProvider: boolean } } = {
 			capabilities: {
@@ -82,6 +84,11 @@ export class StencilLanguageServer {
 				documentLinkProvider: {
 					resolveProvider: true
 				},
+				workspace: {
+					workspaceFolders: {
+						changeNotifications: true
+					}
+				},
 				xfilesProvider: true
 			}
 		}
@@ -89,38 +96,39 @@ export class StencilLanguageServer {
 		return initializeResult;
 	};
 
-	onInitialized(_: InitializedParams): void {
-		this.connection.console.log('StencilLanguageServer Initialized.');
+	async onInitialized(_: InitializedParams): Promise<void> {
+		this.connection.console.log('StencilLanguageServer Initialized');
 		
-		if (this.hasCapability(CAPABILITY.CONFIGURATION)) {
+		if (this.isCapable(CAPABILITY.CONFIGURATION)) {
 			this.connection.client.register(DidChangeConfigurationNotification.type, undefined);
 		}
 		
-		if (this.hasCapability(CAPABILITY.WORKSPACE_FOLDER)) {
+		if (this.isCapable(CAPABILITY.WORKSPACE_FOLDER)) {
 			this.connection.workspace.onDidChangeWorkspaceFolders((_event) => {
-				// connection.console.log('Workspace folder change event received.');
+				logger.info('Workspace folder change event received.');
 			})
 		}
 
-		this.connection.sendRequest('workspace/xfiles').then((response) => {
-			this.connection.console.log(`workspace/xfiles request recieved with response ${JSON.stringify(response, null, 2)}`);
-		})
+		if (this.isCapable(CAPABILITY.X_FILES)) {
+			this.onXfiles();
+		}
+
 	}
 
 	onCompletion({ textDocument, position }: CompletionParams) {
-		return this.service.getCompletionItems(textDocument, position);
+		return this.service.getCompletionItems(textDocument, position, { files: this.projectManager.getFiles() });
 	}
 
 	onCompletionResolve(item: CompletionItem): CompletionItem {
 		return this.service.resolveCompletionItem(item);
 	}
 
-	onDocumentLinks({ textDocument }: DocumentLinkParams) {
-		return (this.hasCapability(CAPABILITY.DOCUMENT_LINKS)) ? this.service.getDocumentLinks(textDocument) : [];
+	async onDocumentLinks({ textDocument }: DocumentLinkParams) {
+		return (this.isCapable(CAPABILITY.DOCUMENT_LINKS)) ? this.service.getDocumentLinks(textDocument) : Promise.resolve([] as DocumentLink[]);
 	}
 
-	onDocumentChange(textDocument: TextDocumentIdentifier) {
-		const diagnostics = this.service.getDiagnostics(textDocument);
+	async onDidChangeTextDocument({ textDocument }: DidChangeTextDocumentParams) {
+		const diagnostics = await this.service.getDiagnostics(textDocument);
 		this.connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 	}
 
@@ -128,10 +136,21 @@ export class StencilLanguageServer {
 		this.projectManager.getSourceFile(textDocument);
 	}
 
-	onXfiles() {
-		this.connection.sendRequest('workspace/xfiles').then(response => {
-			this.connection.console.log('workspace/xfiles response success');
-		})
+	/** 
+	 * Folder removal doesn't send file DELETE events...
+	 * To make sure things are N*SYNC, we'll need a sanity check
+	 * before making use of the File State we're priming here
+	 * https://github.com/Microsoft/vscode-languageserver-node/issues/141
+	 */
+	onDidChangeWatchedFiles({ changes }: DidChangeWatchedFilesParams) {
+		this.service.updateFiles({ changes });
+	}
+
+	async onXfiles() {
+		const files = await this.connection.sendRequest('workspace/xfiles');
+		if (files && Array.isArray(files)) {
+			this.service.setFiles(files.map(file => `${file.scheme}://${file.path}` ))
+		}
 	}
 
 }

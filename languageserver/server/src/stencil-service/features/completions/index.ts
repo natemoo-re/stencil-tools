@@ -1,28 +1,30 @@
 import * as ts from 'typescript';
 import { CompletionItem, TextEdit, InsertTextFormat, CompletionItemKind, Position, TextDocumentIdentifier } from 'vscode-languageserver';
 import { getAutoImportEdit, StencilImport } from './auto-import';
-import { getDecoratorName } from './util';
+import { getDecoratorName, providePathCompletions } from './util';
 import { DECORATORS, METHODS, LIFECYCLE_METHODS } from './component';
 import { PROPS } from './router';
 import { PREFIXES, KEYCODE_SUFFIX, isElementRefPrefix, DOM_EVENT_SUFFIX } from './listen';
-import { ELEMENTS } from './elements';
+import { SLOTS } from './elements';
 import { DocumentMetadata } from '../metadata';
+
+import { logger } from '../../../language-server';
 
 class CompletionController {
 
 	private COMPONENT: CompletionItem[] = [...DECORATORS, ...METHODS, ...LIFECYCLE_METHODS];
-	private ELEMENTS: CompletionItem[] = [...ELEMENTS];
+	private ELEMENTS: CompletionItem[] = [...SLOTS];
 	private ROUTER: CompletionItem[] = [...PROPS];
 
-	public getCompletions(textDocument: TextDocumentIdentifier, sourceFile: ts.SourceFile, position: Position, metadata: DocumentMetadata, checker: any) {
+	public getCompletions(textDocument: TextDocumentIdentifier, sourceFile: ts.SourceFile, position: Position, metadata: DocumentMetadata, checker: ts.TypeChecker, files: string[]) {
 		const offset = sourceFile.getPositionOfLineAndCharacter(position.line, position.character);
 		const container = this.getNodeContainingPosition(sourceFile, offset);
 
 		if (!container) return [];
 
 		const { componentMembers } = metadata;
-		return CompletionService.getByNode(container, { componentMembers, checker })
-			.map(CompletionService.addData({ textDocument }));
+		return this.getByNode(sourceFile, container, { componentMembers, checker, files })
+			.map(this.addData({ textDocument, files }));
 	}
 
 	public resolveCompletions(item: CompletionItem, metadata: DocumentMetadata) {
@@ -87,7 +89,7 @@ class CompletionController {
 		return completions;
 	}
 
-	private getByNode(node: ts.Node, context: { componentMembers: string[], checker: ts.TypeChecker }): CompletionItem[] {
+	private getByNode(sourceFile: ts.SourceFile, node: ts.Node, context: { componentMembers: string[], checker: ts.TypeChecker, files: string[] }): CompletionItem[] {
 		const completions: CompletionItem[] = [];
 		switch (node.kind) {
 			case ts.SyntaxKind.ClassDeclaration: 
@@ -118,16 +120,61 @@ class CompletionController {
 							completions.push(...DOM_EVENT_SUFFIX.map(x => ({ label: x, kind: CompletionItemKind.EnumMember })));
 						}
 					}
-					console.log(decorator, current);
+				} else {
+					
+					// TODO: this could be cleaned up a lot...
+
+					const parent = node.parent;
+					let assignment: ts.PropertyAssignment;
+					let container: ts.CallExpression;
+
+					if (ts.isPropertyAssignment(parent)) {
+						assignment = parent;
+						if (ts.isCallExpression(parent.parent.parent)) {
+							container = parent.parent.parent
+						} else if (ts.isPropertyAssignment(parent.parent.parent)) {
+							assignment = parent.parent.parent; 
+							container = assignment.parent.parent as ts.CallExpression;
+						}
+					} else if (ts.isArrayLiteralExpression(parent)) {
+						assignment = parent.parent && ts.isPropertyAssignment(parent.parent) && parent.parent;
+						container = parent.parent.parent.parent && ts.isCallExpression(parent.parent.parent.parent) && parent.parent.parent.parent;
+					}
+					
+					if (container && ts.isDecorator(container.parent)) {
+						const property = ts.isIdentifier(assignment.name) && assignment.name.text;
+						// TODO Make sure we're actually in the Component decorator?
+						// const decorator = ts.isIdentifier(container.parent.expression) && container.parent.expression.text;
+
+						// This is the fun part
+						if (/styleUrls?/gm.test(property)) {
+							completions.push(...providePathCompletions({ uri: sourceFile.fileName }, context.files, {
+								relativeTo: ts.isStringLiteral(node) && node.text,
+								includeDirs: true,
+								includeFiles: true,
+								pattern: ['**/*.css', '**/*.s{c,a}ss', '**/*.styl{us,}', '**/*.pcss', '!**/*.vars.*']
+							}))
+						} else if (/assetsDirs?/gm.test(property)) {
+							completions.push(...providePathCompletions({ uri: sourceFile.fileName }, context.files, {
+								relativeTo: ts.isStringLiteral(node) && node.text,
+								includeDirs: true,
+								includeFiles: false
+							}))
+						}
+					}
+
 				}
 				break;
 			case ts.SyntaxKind.JsxElement:
 			case ts.SyntaxKind.JsxText:
-				console.log(node);
+				completions.push(...this.ELEMENTS);
+				
 				const ambient = context.checker.getAmbientModules();
-				// ambient.find((x) => )
-				// console.log(intrinsicTagNames);
-				completions.push(...['app-root', 'app-profile', 'app-home'].map(tag => ({ label: tag, insertText: `<${tag}>$0</${tag}>`, insertTextFormat: InsertTextFormat.Snippet })));
+				// const intrinsicTagNames = context.checker.getJsxIntrinsicTagNamesAt(sourceFile);
+				logger.info(ambient.map(x => x.name));
+				// logger.info(intrinsicTagNames.map(x => x.name));
+
+				// completions.push(...['app-root', 'app-profile', 'app-home'].map(tag => ({ label: tag, insertText: `<${tag}>$0</${tag}>`, insertTextFormat: InsertTextFormat.Snippet })));
 				break;
 			default:
 				const kind = ts.SyntaxKind[node.kind];

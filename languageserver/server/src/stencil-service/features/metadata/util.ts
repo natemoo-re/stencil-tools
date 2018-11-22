@@ -1,21 +1,52 @@
 import * as ts from 'typescript';
 import { Range } from 'vscode-languageserver';
+import { logger } from '../../../language-server';
 
-export function getComponentOptions(sourceFile: ts.SourceFile): { value: any, range: Range } {
+export function getComponentOptions(sourceFile: ts.SourceFile): { value: any, range: Range, text: string } {
 	let options: any = null;
 	let range: Range = null;
+	let text: string = null;
 
 	function visit(node: ts.Node) {
 		if (ts.isClassDeclaration(node) && isComponentClass(node)) {
 			const component = node.decorators.filter(isDecoratorNamed('Component'))[0];
 			options = getDeclarationParameters<any>(sourceFile, component);
 			range = Range.create(ts.getLineAndCharacterOfPosition(sourceFile, component.pos), ts.getLineAndCharacterOfPosition(sourceFile, component.end))
+			text = component.getText(sourceFile);
 		}
 		node.forEachChild(visit);
 	}
 	visit(sourceFile);
 	
-	return { value: options[0], range };
+	return { value: options[0], range, text };
+}
+
+export function getReferencedLinks(sourceFile: ts.SourceFile): ts.Node[] {
+	let links: ts.Node[] = [];
+	
+	function visit(node: ts.Node) {
+		if (ts.isClassDeclaration(node) && isComponentClass(node)) {
+			const component = node.decorators.filter(isDecoratorNamed('Component'))[0];
+			const object: ts.ObjectLiteralExpression = ts.isCallExpression(component.expression) && ts.isObjectLiteralExpression(component.expression.arguments[0]) && component.expression.arguments[0] as ts.ObjectLiteralExpression;
+			const pairs = getObjectLiteralPropertyPairs(object);
+
+			links = pairs
+				.filter(({ key }) => /(styleUrl|assetDir)s?/g.test(key.text))
+				.map(({ value }) => {
+					switch (value.kind) {
+						case ts.SyntaxKind.StringLiteral: return value;
+						case ts.SyntaxKind.ArrayLiteralExpression: return (value as ts.ArrayLiteralExpression).elements.filter(x => ts.isStringLiteral(x));
+						case ts.SyntaxKind.ObjectLiteralExpression: return getObjectLiteralPropertyPairs(value as ts.ObjectLiteralExpression).map(x => x.value);
+						default: return null;
+					}
+				})
+				.reduce((collect: ts.Node[], value) => (Array.isArray(value) ? [...collect, ...value] : [...collect, value]), []) as ts.Node[];
+		}
+		node.forEachChild(visit);
+	}
+
+	visit(sourceFile);
+	return links.filter((x: ts.Node) => x && x.getText(sourceFile));
 }
 
 interface DecoratedMembers {
@@ -33,7 +64,9 @@ export function getDecoratedMembers(sourceFile: ts.SourceFile): DecoratedMembers
 	const watched: string[] = [];
 
 	function visit(node: ts.Node) {
-		if (ts.isClassDeclaration(node) && isComponentClass(node)) {
+		if (!node) return;
+		if (node && ts.isClassDeclaration(node) && isComponentClass(node)) {
+			
 			members.push(...node.members.filter(ts.isMethodDeclaration).map(m => ts.isIdentifier(m.name) && m.name.text));
 			
 			node.members
@@ -87,6 +120,18 @@ export function isDecoratorNamed(name: string) {
 	return (dec: ts.Decorator): boolean => {
 		return (ts.isCallExpression(dec.expression) && ts.isIdentifier(dec.expression.expression) && dec.expression.expression.text === name);
 	};
+}
+
+function getObjectLiteralPropertyPairs(obj: ts.ObjectLiteralExpression): { key: ts.Identifier, value: ts.Node }[] {
+	let props: { key: ts.Identifier, value: ts.Node }[] = [];
+	function visit(node: ts.Node) {
+		if (ts.isPropertyAssignment(node)) {
+			props.push({ key: ts.isIdentifier(node.name) && node.name, value: node.initializer as ts.Node });
+		}
+		node.forEachChild(visit);
+	}
+	visit(obj)
+	return props;
 }
 
 function getDecoratorName(member: ts.ClassElement): string {

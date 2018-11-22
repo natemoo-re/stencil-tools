@@ -1,27 +1,35 @@
 import { CompletionItem, MarkupKind, InsertTextFormat, CompletionItemKind } from 'vscode-languageserver';
 import { flatten } from './util';
 
-export const ELEMENTS: CompletionItem[] = [
+export const SLOTS: CompletionItem[] = [
     {
-        label: 'Named',
-        insertText: `<slot name="{$1:name}"></slot>`,
-        description: '',
-        preview: "@Prop() match!: MatchResults;"
+        label: '',
+        detail: 'Slot',
+        insertText: '<slot />$0',
+        preview: "<slot />"
+    },
+    {
+        label: '-name',
+        detail: 'Slot (Named)',
+        insertText: '<slot name="${1:value}" />$0',
+        preview: '<slot name="value" />'
     }
 ].map((item) => {
     return {
-        label: item.label,
-        detail: `Slot: \n${item.label}`,
-        kind: CompletionItemKind.Snippet,
+        label: `slot${item.label}`,
+        detail: item.detail,
+        kind: CompletionItemKind.Property,
         documentation: {
             kind: MarkupKind.Markdown,
-            value: flatten(item.description)
+            value: `\`\`\`tsx
+${flatten(item.preview)}
+\`\`\``
         },
         insertText: flatten(item.insertText),
         insertTextFormat: InsertTextFormat.Snippet,
         data: {
             resolve: false,
-            isFilterable: true
+            isFilterable: false
         }
     }
 });
