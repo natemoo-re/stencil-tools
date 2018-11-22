@@ -26,9 +26,9 @@ export function getRouterImport(sourceFile: ts.SourceFile): ImportLine {
 	return getImport(sourceFile, '@stencil/router');
 }
 
-export function getAutoImportEdit(stencilImport: ImportLine, insertText: string): TextEdit[] {
+export function getAutoImportEdit(importLine: ImportLine, insertText: string): TextEdit[] {
 	const edits = [];
-	const { range, imports, multiline } = stencilImport;
+	const { range, imports, multiline } = importLine;
 	const sep = multiline ? '\n' : ' ';
 	// TODO fix indentation logic... just hardcoded for now
 	const indent = multiline ? '\t' : '';

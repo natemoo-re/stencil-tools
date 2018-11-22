@@ -10,11 +10,14 @@
   },
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
+  "bin": {
+    "st": "dist/index.js"
+  },
   "scripts": {
     "start": "npm run build && npm run dev",
     "watch": "tsc -w -p .",
     "build": "tsc -p .",
-    "dev": "node ./dist/index.js"
+    "dev": "node dist/index.js"
   },
   "homepage": "https://github.com/natemoo-re/stencil-tools/#readme",
   "repository": {
@@ -26,6 +29,7 @@
   },
   "dependencies": {
     "@stencil-tools/generator": "3.0.0-alpha.0",
+    "colorette": "^1.0.7",
     "graceful-fs": "^4.1.15",
     "typescript": "^3.0.1"
   },
