@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { StencilLanguageServer } from './language-server';
 import { createConnection, IConnection, StreamMessageReader, StreamMessageWriter } from 'vscode-languageserver';
 

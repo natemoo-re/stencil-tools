@@ -8,7 +8,10 @@
     "url": "https://projects.natemoo.re",
     "email": "nate@natemoo.re"
   },
-  "main": "dist/main.js",
+  "main": "dist/ipc.js",
+  "bin": {
+    "stls": "dist/stdio.js"
+  },
   "types": "dist/types/main.d.ts",
   "scripts": {
     "start": "npm run watch",
@@ -24,10 +27,12 @@
     "url": "https://github.com/natemoo-re/stencil-tools/issues"
   },
   "dependencies": {
+    "multimatch": "^2.1.0",
     "typescript": "^3.0.1",
     "vscode-languageserver": "^4.4.0"
   },
   "devDependencies": {
+    "@types/multimatch": "^2.1.2",
     "@types/node": "^10.7.0"
   }
 }

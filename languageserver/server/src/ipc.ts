@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { StencilLanguageServer } from './language-server';
 import { createConnection, ProposedFeatures } from 'vscode-languageserver';
 
