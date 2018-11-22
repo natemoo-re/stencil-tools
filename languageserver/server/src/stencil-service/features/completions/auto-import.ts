@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
 import { Range, TextEdit } from 'vscode-languageserver';
 
-export interface StencilImport {
+export interface ImportLine {
 	range: Range;
 	imports: string[];
 	multiline: boolean;
@@ -19,39 +19,14 @@ function alphabetize(arr: string[]) {
 	return alphabetized.map((el) => arr[el.index]);
 }
 
-export function getStencilImport(sourceFile: ts.SourceFile): StencilImport {
-	let stencilImportClause: any;
-
-	function visit(node: ts.Node) {
-		if (!stencilImportClause) {
-			if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier) && node.moduleSpecifier.text === '@stencil/core') {
-				if (!(node.importClause && node.importClause.namedBindings && ts.isNamedImports(node.importClause.namedBindings))) return;
-				let imports;
-				const start = ts.getLineAndCharacterOfPosition(sourceFile, node.importClause.pos + 1);
-				const end = ts.getLineAndCharacterOfPosition(sourceFile, node.importClause.end);
-				const range: Range = Range.create(start, end);
-				const multiline = (start.line !== end.line);
-
-				imports = node.importClause.namedBindings.elements;
-				imports = imports.map(el => {
-					if (el.propertyName && ts.isIdentifier(el.propertyName)) {
-						return `${el.propertyName.text} as ${el.name.text}`;
-					} else {
-						return `${el.name.text}`;
-					}
-				});
-				stencilImportClause = { range, multiline, imports };
-			}
-		}
-
-		node.forEachChild(visit);
-	}
-
-	visit(sourceFile);
-	return stencilImportClause;
+export function getStencilImport(sourceFile: ts.SourceFile): ImportLine {
+	return getImport(sourceFile, '@stencil/core');
+}
+export function getRouterImport(sourceFile: ts.SourceFile): ImportLine {
+	return getImport(sourceFile, '@stencil/router');
 }
 
-export function getAutoImportEdit(stencilImport: StencilImport, insertText: string): TextEdit[] {
+export function getAutoImportEdit(stencilImport: ImportLine, insertText: string): TextEdit[] {
 	const edits = [];
 	const { range, imports, multiline } = stencilImport;
 	const sep = multiline ? '\n' : ' ';
@@ -64,4 +39,34 @@ export function getAutoImportEdit(stencilImport: StencilImport, insertText: stri
 		edits.push(edit);
 	}
 	return edits;
+}
+
+function getImport(sourceFile: ts.SourceFile, moduleName: string): ImportLine {
+	let importLine: ImportLine;
+
+	function visit(node: ts.Node) {
+		if (!importLine) {
+			if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier) && node.moduleSpecifier.text === moduleName) {
+				if (!(node.importClause && node.importClause.namedBindings && ts.isNamedImports(node.importClause.namedBindings))) return;
+				let imports;
+				const start = ts.getLineAndCharacterOfPosition(sourceFile, node.importClause.pos + 1);
+				const end = ts.getLineAndCharacterOfPosition(sourceFile, node.importClause.end);
+				const range: Range = Range.create(start, end);
+				const multiline = (start.line !== end.line);
+				imports = node.importClause.namedBindings.elements;
+				imports = imports.map(el => {
+					if (el.propertyName && ts.isIdentifier(el.propertyName)) {
+						return `${el.propertyName.text} as ${el.name.text}`;
+					} else {
+						return `${el.name.text}`;
+					}
+				});
+				importLine = { range, multiline, imports };
+			}
+		}
+		node.forEachChild(visit);
+	}
+
+	visit(sourceFile);
+	return importLine;
 }
