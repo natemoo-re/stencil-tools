@@ -2,7 +2,7 @@ import * as path from 'path';
 import { ContentGenerator } from './content-generator';
 import { FileSystem } from './fs/interface';
 import { mkdirp } from './fs/utils';
-import { createSelector, dashToPascal, loadConfigFile, guessPrefix } from './utils/index';
+import { createSelector, dashToPascal, loadConfigFile, guessPrefix, deriveStyleExt } from './utils/index';
 import getStencilIntrinsicElements from './utils/elements';
 
 interface Options {
@@ -40,12 +40,12 @@ export class StencilGenerator {
     private config: any;
     constructor(private sys: { fs: FileSystem }, private rootDir: string) {
         if (!path.isAbsolute(rootDir)) throw new Error('StencilGenerator requires a `rootDir`, an absolute path to the project\'s root directory');
-        this.initialize();
     }
 
     private async initialize() {
         await this.setConfig();
         this.inStencilProject = await this.isStencilProject();
+        await this.updateComponents();
     }
 
     private async isStencilProject(): Promise<boolean> {
@@ -70,9 +70,9 @@ export class StencilGenerator {
         
         try {
             if (await fs.stat(tsPath).then(x => x.isFile())) {
-                this.config = loadConfigFile(fs, tsPath);
+                this.config = await loadConfigFile(fs, tsPath);
             } else if (await fs.stat(jsPath).then(x => x.isFile())) {
-                this.config = loadConfigFile(fs, jsPath);
+                this.config = await loadConfigFile(fs, jsPath);
             } else {
                 this.config = null;
             }
@@ -95,10 +95,14 @@ export class StencilGenerator {
         }
     }
 
-    private cache: Map<'create'|'deferred', any> = new Map();
+    private cache: Map<'create' | 'deferred', any> = new Map();
+
 
     async create(name: string, opts: GeneratorOptions) {
+        await this.initialize();
         if (!this.inStencilProject) throw new Error('Stencil Generator does not appear to be running inside of a Stencil project. Is @stencil/core installed?');
+        console.log(this.config);
+        const styleExt = await deriveStyleExt(this.config);
 
         this.cache = new Map();
         const defaultOpts: GeneratorOptions = {
@@ -110,7 +114,7 @@ export class StencilGenerator {
             componentImports: [],
             componentShadow: true,
             generateStyle: true,
-            styleExt: 'css',
+            styleExt,
             generateE2E: true,
             generateSpec: true
         }

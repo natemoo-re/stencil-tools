@@ -3,7 +3,8 @@ import * as ts from 'typescript';
 import * as path from 'path';
 
 export async function loadConfigFile(fs: FileSystem, configPath: string) {
-    return await requireConfigFile(fs, configPath);
+    const { config } = await requireConfigFile(fs, configPath);
+    return config;
 }
 
 export async function requireConfigFile(fs: FileSystem, configFilePath: string) {
