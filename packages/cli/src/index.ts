@@ -9,7 +9,6 @@ import { fs } from './sys';
 import { getProjectRoot, isStencilProject } from './utils/project';
 
 import { GenerateComponent } from './commands';
-
 export let Generator: StencilGenerator;
 
 const USAGE_DOCS = `Usage:
