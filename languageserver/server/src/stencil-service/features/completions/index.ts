@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import { CompletionItem, TextEdit, InsertTextFormat, CompletionItemKind, Position, TextDocumentIdentifier } from 'vscode-languageserver';
-import { getAutoImportEdit, StencilImport } from './auto-import';
+import { getAutoImportEdit, ImportLine } from './auto-import';
 import { getDecoratorName, providePathCompletions } from './util';
 import { DECORATORS, METHODS, LIFECYCLE_METHODS } from './component';
 import { PROPS } from './router';
@@ -183,7 +183,7 @@ class CompletionController {
 		return completions;
 	}
 
-	private buildAdditionalTextEdits(stencilImport: StencilImport, insertText: string): TextEdit[] {
+	private buildAdditionalTextEdits(stencilImport: ImportLine, insertText: string): TextEdit[] {
 		return getAutoImportEdit(stencilImport, insertText);
 	}
 

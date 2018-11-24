@@ -1,12 +1,12 @@
 import { Node } from 'typescript';
-import { getStencilImport, StencilImport } from '../completions/auto-import';
+import { getStencilImport, ImportLine } from '../completions/auto-import';
 import { TextDocumentIdentifier, Range } from 'vscode-languageserver';
 import { ProjectManager } from '../../../project-manager';
 
 import { getDecoratedMembers, getComponentOptions, getReferencedLinks } from './util';
 
 export interface DocumentMetadata {
-	stencilImport: StencilImport;
+	stencilImport: ImportLine;
 	componentOptions: { value: { [key: string]: any }, range: Range, text: string };
 	componentMembers: string[];
 	methods: string[];
