@@ -7,7 +7,6 @@ export default async (tag: string) => {
     const root = await getProjectRoot();
     
     await Generator.create(tag, {
-        baseDir: path.join(root as string, 'src', 'components'),
-        styleExt: 'scss'
+        baseDir: path.join(root as string, 'src', 'components')
     });
 }
