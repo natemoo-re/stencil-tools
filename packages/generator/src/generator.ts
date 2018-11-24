@@ -2,8 +2,9 @@ import * as path from 'path';
 import { ContentGenerator } from './content-generator';
 import { FileSystem } from './fs/interface';
 import { mkdirp } from './fs/utils';
-import { createSelector, dashToPascal, loadConfigFile, guessPrefix, deriveStyleExt } from './utils/index';
+import { createSelector, dashToPascal, loadConfigFile, guessPrefix, deriveStyleExt, deriveIndent, getReferencedStyles } from './utils/index';
 import getStencilIntrinsicElements from './utils/elements';
+import style from './templates/style';
 
 interface Options {
     baseDir: string;
@@ -46,6 +47,9 @@ export class StencilGenerator {
         await this.setConfig();
         this.inStencilProject = await this.isStencilProject();
         await this.updateComponents();
+        
+        const indent = await deriveIndent(this.sys.fs, this.rootDir);
+        if (indent) { this.set('indent' as any, indent as any ) }
     }
 
     private async isStencilProject(): Promise<boolean> {
@@ -97,11 +101,62 @@ export class StencilGenerator {
 
     private cache: Map<'create' | 'deferred', any> = new Map();
 
+    async rename(from: string, to: string, opts?: { baseDir?: string, componentClassName?: string }) {
+        const defaultOpts = {
+            baseDir: '',
+            componentClassName: ''
+        };
+        opts = { ...defaultOpts, ...opts };
+
+        const className = opts.componentClassName ? opts.componentClassName : dashToPascal(to);
+        let fromDir = opts.baseDir.endsWith(from) ? opts.baseDir : path.join(opts.baseDir, from);
+        let toDir = opts.baseDir.endsWith(to) ? opts.baseDir : path.join(opts.baseDir, to);
+        
+        let files: Map<string, string> = new Map();
+        let newFiles: Map<string, string> = new Map();
+        let styles: string[];
+        let baseFiles = ['tsx', 'e2e.ts', 'spec.ts']
+            .map(ext => `${from}.${ext}`)
+            .map(fileName => path.join(fromDir, fileName));
+        
+        const [component, ...tests] = await Promise.all(baseFiles.map(file => this.sys.fs.readFile(file)));
+        files.set(baseFiles[0], component);
+        files.set(baseFiles[1], tests[0]);
+        files.set(baseFiles[2], tests[1]);
+        if (component) styles = getReferencedStyles(component);
+        
+        let baseStyles = styles
+            .map(fileName => path.isAbsolute(fileName) ? fileName : path.join(fromDir, fileName));
+        const styleFiles = await Promise.all(baseStyles.map(file => this.sys.fs.readFile(file)));
+        for (let i = 0; i < styles.length; i++) {
+            const fileName = baseStyles[i];
+            const fileContent = styleFiles[i];
+            files.set(fileName, fileContent);
+        }
+
+        const escape = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const pattern = new RegExp(`\\b${escape(from)}\\b`, 'g');
+
+        for (let [fileName, fileContent] of files.entries()) {
+            newFiles.set(fileName.replace(pattern, to), fileContent.replace(pattern, to));
+        }
+
+        await mkdirp(this.sys.fs, path.dirname(path.join(toDir, to)));
+        let tasks: any = [];
+        for (let filePath of files.keys()) {
+            tasks.push(this.sys.fs.unlink(filePath));
+        }
+        tasks.push(this.sys.fs.rmdir(fromDir))
+        for (let [filePath, fileContent] of newFiles.entries()) {
+            tasks.push(this.sys.fs.writeFile(filePath, fileContent));
+        }
+        await Promise.all(tasks);
+    }
+
 
     async create(name: string, opts: GeneratorOptions) {
         await this.initialize();
         if (!this.inStencilProject) throw new Error('Stencil Generator does not appear to be running inside of a Stencil project. Is @stencil/core installed?');
-        console.log(this.config);
         const styleExt = await deriveStyleExt(this.config);
 
         this.cache = new Map();
@@ -201,7 +256,7 @@ export class StencilGenerator {
         if (deferred.length) {
             this.cache.set('deferred', deferred);
             await Promise.all(tasks.map(({ filePath, content }) => this.sys.fs.writeFile(filePath, content)));
-            return Promise.reject(`${deferred.map(x => path.basename(x.filePath)).join(', ')}`);
+            return Promise.reject(`${deferred.map(x => path.basename(x.filePath)).join(', ')} already exist`);
         } else {
             await Promise.all(tasks.map(({ filePath, content }) => this.sys.fs.writeFile(filePath, content)));
             return Promise.resolve();
@@ -229,5 +284,12 @@ export class StencilGenerator {
         const tasks = [...this.cache.get('deferred')]
         await Promise.all(tasks.map(({ filePath, content }) => this.sys.fs.writeFile(filePath, content)));
         return Promise.resolve();
+    }
+
+    set(config: 'indent', value: { style: 'space', size: number }): void;
+    set(config: 'indent', value: { style: 'tab' }): void;
+    set(config: 'quote', value: 'single' | 'double'): void;
+    set(config: string, value: any): void {
+        ContentGenerator.set(config as any, value as any);
     }
 }

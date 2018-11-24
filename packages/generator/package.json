@@ -25,7 +25,7 @@
     "url": "https://github.com/natemoo-re/stencil-tools/issues"
   },
   "devDependencies": {
-    "@types/node": "^10.7.0",
+    "@types/node": "^10.12.10",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.1"
   },
@@ -40,5 +40,8 @@
     "require": [
       "ts-node/register"
     ]
+  },
+  "dependencies": {
+    "editorconfig": "^0.15.2"
   }
 }

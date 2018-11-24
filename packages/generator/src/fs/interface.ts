@@ -3,6 +3,8 @@ export interface FileSystem {
     writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<void>;
     mkdir(dirPath: string): Promise<void>;
     stat(path: string): Promise<FsStats>;
+    rmdir(dirPath: string): Promise<void>;
+    unlink(filePath: string): Promise<void>;
     // copyFile(src: string, dest: string): Promise<void>;
     // createReadStream(filePath: string): any;
     // exists(filePath: string): Promise<boolean>;
@@ -11,9 +13,7 @@ export interface FileSystem {
     // readdir(dirPath: string): Promise<string[]>;
     // readdirSync(dirPath: string): string[];
     // readFileSync(filePath: string): string;
-    // rmdir(dirPath: string): Promise<void>;
     // statSync(path: string): FsStats;
-    // unlink(filePath: string): Promise<void>;
     // writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<void>;
     // writeFileSync(filePath: string, content: string, opts?: FsWriteOptions): void;
 }
