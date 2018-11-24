@@ -1,6 +1,6 @@
 {
 	"name": "atom-stencil-tools",
-	"version": "3.0.0-alpha.0",
+	"version": "3.0.0-alpha.1",
 	"license": "MIT",
 	"author": {
 		"name": "Nate Moore",
@@ -17,7 +17,7 @@
 		"url": "https://github.com/natemoo-re/stencil-tools/issues"
 	},
 	"dependencies": {
-		"@stencil-tools/languageserver": "^3.0.0-alpha.0",
+		"@stencil-tools/languageserver": "^3.0.0-alpha.1",
 		"atom-languageclient": "^0.9.8"
 	},
 	"categories": [

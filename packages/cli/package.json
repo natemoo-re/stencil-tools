@@ -1,6 +1,6 @@
 {
   "name": "@stencil-tools/cli",
-  "version": "3.0.0-alpha.0",
+  "version": "3.0.0-alpha.1",
   "description": "",
   "license": "MIT",
   "author": {
@@ -28,7 +28,7 @@
     "url": "https://github.com/natemoo-re/stencil-tools/issues"
   },
   "dependencies": {
-    "@stencil-tools/generator": "3.0.0-alpha.0",
+    "@stencil-tools/generator": "^3.0.0-alpha.1",
     "colorette": "^1.0.7",
     "graceful-fs": "^4.1.15",
     "prompts": "^1.2.1",

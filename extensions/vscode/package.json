@@ -2,7 +2,7 @@
 	"name": "vscode-stencil-tools",
 	"displayName": "Stencil Tools",
 	"description": "Helpful utilities for StencilJS Projects",
-	"version": "3.0.0-alpha.0",
+	"version": "3.0.0-alpha.1",
 	"license": "MIT",
 	"author": {
 		"name": "Nate Moore",
@@ -30,8 +30,8 @@
 		"url": "https://github.com/natemoo-re/stencil-tools/issues"
 	},
 	"dependencies": {
-		"@stencil-tools/generator": "3.0.0-alpha.0",
-		"@stencil-tools/languageserver": "^3.0.0-alpha.0",
+		"@stencil-tools/generator": "^3.0.0-alpha.1",
+		"@stencil-tools/languageserver": "^3.0.0-alpha.1",
 		"graceful-fs": "^4.1.15",
 		"typescript": "^3.1.6",
 		"typescript-plugin-stencil": "^0.1.1-alpha",
@@ -63,7 +63,9 @@
 	],
 	"contributes": {
 		"typescriptServerPlugins": [
-			{ "name": "typescript-plugin-stencil" }
+			{
+				"name": "typescript-plugin-stencil"
+			}
 		],
 		"commands": [
 			{
