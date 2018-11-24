@@ -4,6 +4,9 @@
 	"description": "Helpful utilities for StencilJS Projects",
 	"version": "3.0.0-alpha.1",
 	"license": "MIT",
+	"files": [
+		"dist"
+	],
 	"author": {
 		"name": "Nate Moore",
 		"url": "https://projects.natemoo.re",
