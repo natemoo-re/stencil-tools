@@ -12,6 +12,9 @@
   "bin": {
     "stls": "dist/stdio.js"
   },
+  "files": [
+    "dist"
+  ],
   "types": "dist/types/main.d.ts",
   "scripts": {
     "start": "npm run watch",
