@@ -23,6 +23,13 @@ export const getComponentOptions = (sourceText: string): any => {
     return null;
 }
 
+export const getComponentClassName = (sourceText: string): string => {
+    const pattern = /\@Component[\s\S]+?export\s*(?:default|)\s*class([\s\S]*?)\{/g;
+    const match = pattern.exec(sourceText);
+    if (match && match[1]) return match[1].trim();
+    return null;
+}
+
 export const getReferencedStyles = (sourceText: string): string[] => {
     const componentOpts = getComponentOptions(sourceText);
     let styles: string[] = [];

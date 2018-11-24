@@ -2,9 +2,8 @@ import * as path from 'path';
 import { ContentGenerator } from './content-generator';
 import { FileSystem } from './fs/interface';
 import { mkdirp } from './fs/utils';
-import { createSelector, dashToPascal, loadConfigFile, guessPrefix, deriveStyleExt, deriveIndent, getReferencedStyles } from './utils/index';
+import { createSelector, dashToPascal, loadConfigFile, guessPrefix, deriveStyleExt, deriveIndent, getReferencedStyles, getComponentClassName } from './utils/index';
 import getStencilIntrinsicElements from './utils/elements';
-import style from './templates/style';
 
 interface Options {
     baseDir: string;
@@ -115,6 +114,7 @@ export class StencilGenerator {
         let files: Map<string, string> = new Map();
         let newFiles: Map<string, string> = new Map();
         let styles: string[];
+        let fromClassName: string;
         let baseFiles = ['tsx', 'e2e.ts', 'spec.ts']
             .map(ext => `${from}.${ext}`)
             .map(fileName => path.join(fromDir, fileName));
@@ -123,7 +123,10 @@ export class StencilGenerator {
         files.set(baseFiles[0], component);
         files.set(baseFiles[1], tests[0]);
         files.set(baseFiles[2], tests[1]);
-        if (component) styles = getReferencedStyles(component);
+        if (component) {
+            styles = getReferencedStyles(component);
+            fromClassName = getComponentClassName(component);
+        }
         
         let baseStyles = styles
             .map(fileName => path.isAbsolute(fileName) ? fileName : path.join(fromDir, fileName));
@@ -135,18 +138,18 @@ export class StencilGenerator {
         }
 
         const escape = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const pattern = new RegExp(`\\b${escape(from)}\\b`, 'g');
+        const tagPattern = new RegExp(`\\b${escape(from)}\\b`, 'g');
+        const classNamePattern = new RegExp(`\\b${escape(fromClassName)}\\b`, 'g');
 
         for (let [fileName, fileContent] of files.entries()) {
-            newFiles.set(fileName.replace(pattern, to), fileContent.replace(pattern, to));
+            newFiles.set(fileName.replace(tagPattern, to), fileContent.replace(tagPattern, to).replace(classNamePattern, className));
         }
 
         await mkdirp(this.sys.fs, path.dirname(path.join(toDir, to)));
+        await Promise.all([[...files.keys()].map(filePath => this.sys.fs.unlink(filePath))])
+        await this.sys.fs.rmdir(fromDir)
+        
         let tasks: any = [];
-        for (let filePath of files.keys()) {
-            tasks.push(this.sys.fs.unlink(filePath));
-        }
-        tasks.push(this.sys.fs.rmdir(fromDir))
         for (let [filePath, fileContent] of newFiles.entries()) {
             tasks.push(this.sys.fs.writeFile(filePath, fileContent));
         }
