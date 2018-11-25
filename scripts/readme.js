@@ -7,7 +7,7 @@ const writeFile = promisify(fs.writeFile);
 const data = {
     repo: 'natemoo-re/stencil-tools',
     title: 'Stencil Tools',
-    description: 'Stencil Tools is a suite of utilities for [Stencil](https://stenciljs.com) projects.',
+    description: 'Stencil Tools is a suite of editor enhancements and utilities for <a href="https://stenciljs.com">Stencil</a> projects.',
     packages: [
         {
             id: 'cli',
@@ -31,7 +31,7 @@ const data = {
 }
 
 const raw = (asset) => `https://raw.githubusercontent.com/${data.repo}/master/${asset.replace(/^\//, '').replace(/\.svg$/, '.svg?sanitize=true')}`;
-const packageInfo = (pkg) => `[<img src="${raw(`assets/targets/${pkg.id}.svg`)}" width="14" height="14"> **${pkg.title}**](${pkg.gitUrl})`;
+const packageInfo = (pkg) => `[<img src="${raw(`.github/assets/targets/${pkg.id}.svg`)}" width="14" height="14"> **${pkg.title}**](${pkg.gitUrl})`;
 
 const h1 = (title) => `<h1 align="center">${title}</h1>`;
 const p = (content) => `<p align="center">${content}</p>`;
