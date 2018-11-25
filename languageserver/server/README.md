@@ -1,4 +1,5 @@
-# Stencil Language Server
+[Stencil Tools](https://github.com/natemoo-re/stencil-tools/) / 
+# Language Server
 
 The Stencil Language Server (SLS) is built upon the [Language Server Protocol](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md). It enables anyone to add support for [Stencil](https://github.com/ionic-team/stencil) projects in their favorite editor.
 
