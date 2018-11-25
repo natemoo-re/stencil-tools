@@ -6,6 +6,9 @@
     "lerna": "^3.4.3",
     "ts-node": "^7.0.1"
   },
+  "scripts": {
+    "docs": "node scripts/readme.js"
+  },
   "ava": {
     "compileEnhancements": false,
     "files": [
@@ -17,5 +20,9 @@
     "require": [
       "ts-node/register"
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natemoo-re/stencil-tools/"
   }
 }
