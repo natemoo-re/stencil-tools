@@ -7,6 +7,12 @@
   </a>
 </div>
 
+<br>
+<br>
+<br>
+<br>
+<br>
+
 <p align="center">
 	<img src="https://raw.githubusercontent.com/natemoo-re/stencil-tools/master/.github/assets/logo.svg?sanitize=true" width="128" height="128">
 </p>
