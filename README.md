@@ -7,17 +7,17 @@
   </a>
 </div>
 
-<br>
-<br>
-<br>
-<br>
-<br>
-
 <p align="center">
 	<img src="https://raw.githubusercontent.com/natemoo-re/stencil-tools/master/.github/assets/logo.svg?sanitize=true" width="128" height="128">
 </p>
 <h1 align="center">Stencil Tools</h1>
 <p align="center">Stencil Tools is a suite of editor enhancements and utilities for <a href="https://stenciljs.com">Stencil</a> projects.</p>
+
+<br>
+<br>
+<br>
+<br>
+<br>
 
 ## Packages
 
