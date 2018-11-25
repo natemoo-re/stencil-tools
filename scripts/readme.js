@@ -47,7 +47,7 @@ const generate = async () => {
 </div>
 
 <p align="center">
-	<img src="${raw('/assets/logo.svg')}" width="128" height="128">
+	<img src="${raw('.github/assets/logo.svg')}" width="128" height="128">
 </p>
 ${h1(data.title)}
 ${p(data.description)}
