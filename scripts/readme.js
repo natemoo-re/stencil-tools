@@ -27,6 +27,20 @@ const data = {
             url: '',
             gitUrl: './extensions/atom'
         }
+    ],
+    internalPackages: [
+        {
+            id: 'languageserver',
+            title: 'Language Server',
+            url: 'https://npmjs.com/@stencil-tools/languageserver',
+            gitUrl: './packages/cli'
+        },
+        {
+            id: 'generator',
+            title: 'Generator',
+            url: '',
+            gitUrl: './extensions/vscode'
+        }
     ]
 }
 
@@ -52,20 +66,14 @@ const generate = async () => {
 ${h1(data.title)}
 ${p(data.description)}
 
-<br>
-<br>
-<br>
-<br>
-<br>
-
 ## Packages
 
-${data.packages.map((pkg) => packageInfo(pkg)).join('\n\n')}
+${data.packages.map(pkg => packageInfo(pkg)).join('\n\n')}
 
-## Changelog
-Most recent changes go here...
+<br>
+<br>
 
-[View More](./CHANGELOG.md)
+[View Changelog](./CHANGELOG.md)
 `;
     
     await writeFile(path.resolve(__dirname, path.join('..', 'README.md')), readme);

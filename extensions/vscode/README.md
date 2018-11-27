@@ -4,70 +4,51 @@
 [Stencil Tools](https://github.com/natemoo-re/stencil-tools/) / 
 # VS Code Extension
 
-VS Code extension that makes working with [Stencil](https://stenciljs.com/) projects a breeze.
+This extension adds rich language features for [Stencil](https://stenciljs.com/) projects to Visual Studio Code.
 
-### Features
-- Automatically creates Stencil components (`component.tsx`, `component.spec.tsx`, `component.css`)
-- Snippets with Automatic Import support for Stencil Decorators, Lifecycle Events, and Tests
-- Easily start any new Stencil project from the Command Palette
-- Quickly open the Stencil Docs in your browser
-- Configurable component templates
-    - Add a custom prefix to generated component tags
-    - Easily toggle on/off @Component({ shadow: true })
-    - Change the extension of any generated file
-        - `css` => `scss` or `sass`
-        - `spec.ts` => `test.ts`
+![Demo](./assets/demo.gif)
 
-## Usage
-### Generate a Component
-![New Component](./assets/tutorial/new-component.gif)
-- From the File Explorer
-    - Right click on a folder
-    - Select "Generate Stencil Component"
-    - Enter your component name in the prompt
-- From the Command Palette
-    - Select "> Stencil: New Component"
-    - Enter your component name in the prompt
+## Features
 
-### Generate a Test from a Component
-- From the File Explorer
-    - Right click on a component file
-    - Select "Generate Test for Stencil Component"
-- From the Command Palette, when a Component is open
-    - Select "> Stencil: New Test for Component"
+### IntelliSense
 
-### Start a Stencil Project
-![Start a Project](./assets/tutorial/new-project.gif)
-- From the Command Palette
-    - Select "> Stencil: Start New Project"
-    - Select a Starter (components, app, pwa)
-    - Choose an empty directory and click "Start Project"
-    - When you open the new project, Stencil Tools will automatically prepare the project and install any dependencies
+- Auto Completion of built-in component methods (`hostData`, `render`) and lifecycle methods (`componentWillLoad`, `componentDidLoad`, etc)
+- Intelligent suggestions for `Watch` and `Listen` statements
+- Path Completion for `Component` styles and assets
+- Quick Info for symbols on hover (class member is a `State`, `Prop`, `Method`, etc)
 
-### Use Stencil Snippets
-![Use Snippets](./assets/tutorial/use-snippets.gif)
-- From a Component File
-    - type `s-` and select your snippet
+### Code Editing
 
-### Open the Stencil Docs
-![Open Docs](./assets/tutorial/open-docs.gif)
-- From the Command Palette
-    - Select "> Stencil: Open Docs"
+- Generate Components from Explorer or Command Palette
+- Code Snippets for common Stencil features
+- Auto Imports for Stencil decorators
+- Improved Symbol Rename for `Prop` decorated class members
 
-## Changelog
-### 2.0.0 (2018-06-11)
-- Breaking Change: command names are now properly namespaced
-- Overhaul of the `Start Project` feature
-- Brand new snippets with AutoImport
-- Small optimizations to the Component and Test Generators
-- [Read More](./CHANGELOG.md#2.0.0)
+### Diagnostics
 
-#### 1.0.0 (2018-06-06)
-- Published the extension to VS Code Marketplace
+- Inline Stencil diagnostics as you type
+
+### Testing
+
+- Generate unit and e2e tests with new components
+- Generate unit and e2e tests for existing components
+
+### Others
+
+- Open Stencil Docs from Command Palette
+
+---
+
+## Internal Packages
+
+Under the hood, `vscode-stencil-tools` relies on 
+
+- [`@stencil-tools/languageserver`]()
+- [`@stencil-tools/generator`]()
+- [`typescript-plugin-stencil`]()
 
 ## Bugs
-Please report [here](https://github.com/natemoo-re/vscode-stencil-tools/issues)
+Please report [here](https://github.com/natemoo-re/stencil-tools/issues)
 
 ## Credits
-- [vscode-angular2-component-generator](https://github.com/dbaikov/vscode-angular2-component-generator) for the original fork
 - [create-stencil](https://github.com/ionic-team/create-stencil) for much of the `Start Project` logic

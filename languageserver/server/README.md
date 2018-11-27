@@ -4,7 +4,6 @@
 The Stencil Language Server (SLS) is built upon the [Language Server Protocol](https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md). It enables anyone to add support for [Stencil](https://github.com/ionic-team/stencil) projects in their favorite editor.
 
 ## Installation
-(This won't work yet!)
 ```bash
 npm i stencil-languageserver
 ```
@@ -20,9 +19,6 @@ npm i stencil-languageserver
 - Diagnostics
 
 To enable these features in your editor, you can install one of the extensions below (or build your own!)
-
-## Editor Plugins
- - **Visual Studio Code**: [Stencil Tools](https://github.com/natemoo-re/vscode-stencil-tools) *(coming soon)*
 
 ## Creating an Editor Plugin
 

@@ -13,12 +13,6 @@
 <h1 align="center">Stencil Tools</h1>
 <p align="center">Stencil Tools is a suite of editor enhancements and utilities for <a href="https://stenciljs.com">Stencil</a> projects.</p>
 
-<br>
-<br>
-<br>
-<br>
-<br>
-
 ## Packages
 
 [<img src="https://raw.githubusercontent.com/natemoo-re/stencil-tools/master/.github/assets/targets/cli.svg?sanitize=true" width="14" height="14"> **CLI**](./packages/cli)
@@ -27,7 +21,7 @@
 
 [<img src="https://raw.githubusercontent.com/natemoo-re/stencil-tools/master/.github/assets/targets/atom.svg?sanitize=true" width="14" height="14"> **Atom**](./extensions/atom)
 
-## Changelog
-Most recent changes go here...
+<br>
+<br>
 
-[View More](./CHANGELOG.md)
+[View Changelog](./CHANGELOG.md)
