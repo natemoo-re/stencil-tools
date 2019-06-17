@@ -3,7 +3,7 @@ import test from 'ava';
 
 test('generates file without any options', t => {
   const sourceText = component();
-  const template = `import { Component } from '@stencil/core';
+  const template = `import { Component, h } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
@@ -87,7 +87,7 @@ test('sets class name', t => {
 
 test('sets imports', t => {
   const sourceText = component({ imports: ['Prop'] });
-  t.regex(sourceText, /^import \{ Component, Prop \} from '@stencil\/core'/gm)
+  t.regex(sourceText, /^import \{ Component, Prop, h \} from '@stencil\/core'/gm)
 });
 
 test('sets style extension', t => {

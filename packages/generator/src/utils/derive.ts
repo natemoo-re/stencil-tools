@@ -19,7 +19,7 @@ export async function deriveStyleExt(config?: any): Promise<string> {
             // postcss supports .css or .pcss
             // stylus supports .styl or .stylus
             switch (plugin) {
-                case 'sass': return 'scss'
+                case 'sass': return 'scss';
                 case 'postcss': return 'css';
                 case 'stylus': return 'styl';
                 case 'less': return 'less';

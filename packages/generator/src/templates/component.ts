@@ -1,6 +1,7 @@
 import { ComponentOptions } from './declarations';
 import { defaultFormat, createIndent, createQuote } from './shared';
 
+const defaultImports: string[] = ['Component', 'h'];
 const defaultOpts: ComponentOptions = {
     imports: [],
     prefix: '',
@@ -20,7 +21,7 @@ const component = (opts?: Partial<ComponentOptions> & { indent?: string, quotes?
     const indent = createIndent(opts.indent);
     const quote = createQuote(opts.quotes);
     
-    const imports = `{ ${['Component', ...opts.imports].join(', ')} }`;
+    const imports = `{ ${[...defaultImports, ...opts.imports].sort().join(', ')} }`;
     const tag = opts.selector;
     const styleUrl = `${opts.tag}.${opts.styleExt}`;
     const shadow = opts.shadow ? `,\n${indent(1)}shadow: true` : '';

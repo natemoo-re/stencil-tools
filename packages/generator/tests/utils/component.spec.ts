@@ -27,19 +27,19 @@ test('ignores duplicated prefix with trailing slash', t => {
 })
 
 test('guesses prefix if shared', t => {
-    const prefix = guessPrefix({
-        'test-a': true,
-        'test-b': true,
-        'test-c': true
-    })
+    const prefix = guessPrefix([
+        'test-a',
+        'test-b',
+        'test-c'
+    ])
     t.is(prefix, 'test');
 })
 
 test('unable to guess prefix if different', t => {
-    const prefix = guessPrefix({
-        'a-element': true,
-        'b-element': true,
-        'c-element': true
-    })
+    const prefix = guessPrefix([
+        'a-element',
+        'b-element',
+        'c-element'
+    ])
     t.is(prefix, null);
 })
