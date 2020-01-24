@@ -188,13 +188,13 @@ export const DECORATORS: CompletionItem[] = [
 		description: "The `@Method()` decorator is used to expose methods on the public API. Functions decorated with the `@Method()` decorator can be called directly from the element.",
 		insertText: [
 			"@Method()",
-			"${1:methodName}($2) {",
+			"async ${1:methodName}($2) {",
 			"\t$0",
 			"}"
 		],
 		preview: [
 			"@Method()",
-			"methodName() {",
+			"async methodName() {",
 			"\t",
 			"}"
 		],
