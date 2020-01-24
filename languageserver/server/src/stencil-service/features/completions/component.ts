@@ -85,24 +85,6 @@ export const LIFECYCLE_METHODS: CompletionItem[] = [
 
 export const METHODS: CompletionItem[] = [
 	{
-		label: 'hostData',
-		description: 'The `hostData()` method is used to dynamically set host element attributes.',
-		insertText: [
-			"hostData() {",
-			"\treturn {",
-			"\t\t$0",
-			"\t}",
-			"}"
-		],
-		preview: [
-			"hostData() {",
-			"\treturn {",
-			"\t\t",
-			"\t}",
-			"}"
-		]
-	},
-	{
 		label: 'render',
 		description: 'The `render()` method is required in order to render the component.',
 		insertText: [
@@ -154,8 +136,8 @@ export const DECORATORS: CompletionItem[] = [
 	{
 		label: 'Prop',
 		description: 'The `@Prop()` decorator exposes custom attribute/properties publicly on the element, so that developers can provide values to the component.',
-		insertText: "@Prop() ${1:propName}: ${2|any,string,boolean,number|};",
-		preview: "@Prop() propName: any;",
+		insertText: "@Prop(${3|{ mutable: true },{ reflect: true }|}) ${1:propName}: ${2|any,string,boolean,number|};",
+		preview: "@Prop({ mutable: true }) propName: any;",
 		autoImport: 'Prop'
 	},
 	{
@@ -163,15 +145,14 @@ export const DECORATORS: CompletionItem[] = [
 		description: "When a user updates a property, `@Watch()` will fire what ever method it's attached to and pass that methd the new value of the prop along with the old value.",
 		insertText: [
 			"@Watch('${1%computedProps%}')",
-			"${1}Changed() {",
-			"\t${2:console.log('$1 changed to ', this.$1);}$0",
+			"${1}Changed(newValue: ${2|any,string,boolean,number|}, oldValue: $2) {",
+			"\t${3:console.log('$1 changed to ', this.$1);}$0",
 			"}"
 		],
 		preview: [
 			"@Watch('propName')",
-			"propNameChanged() {",
-			"\tconst { propName } = this;",
-			"\tconsole.log('propName changed to ', propName);",
+			"propNameChanged(newValue, oldValue) {",
+			"\tconsole.log('propName changed to ', this.propName);",
 			"}"
 		],
 		autoImport: 'Watch'
@@ -226,7 +207,7 @@ export const DECORATORS: CompletionItem[] = [
 		description: "The `Listen()` decorator is for handling events dispatched from @Events.",
 		insertText: [
 			"@Listen('${1|body,child,document,keydown,parent,window|}')",
-			"protected ${2:listenHandler}(event) {",
+			"protected ${2:$1Handler}(event) {",
 			"\t${3:console.log('Received the \"$1\" event: ', event);}$0",
 			"}"
 		],
